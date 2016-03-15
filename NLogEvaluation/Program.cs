@@ -1,5 +1,8 @@
 ﻿using System;
+using Castle.Facilities.Logging;
+using Castle.Windsor;
 using NLog;
+using ILogger = Castle.Core.Logging.ILogger;
 
 namespace NLogEvaluation
 {
@@ -8,7 +11,9 @@ namespace NLogEvaluation
         private static ILogger logger; 
         static void Main(string[] args)
         {
-            logger = LogManager.GetCurrentClassLogger();
+            var container = new WindsorContainer();
+            container.AddFacility<LoggingFacility>(f => f.UseNLog());
+            logger = container.Resolve<ILogger>();
 
             //var eventInfo = new LogEventInfo();
             //eventInfo.Properties["Foo"] = Guid.NewGuid();
@@ -20,9 +25,10 @@ namespace NLogEvaluation
             MappedDiagnosticsLogicalContext.Set("requestId", Guid.NewGuid());
             MappedDiagnosticsLogicalContext.Set("commandName", "The Command Name");
 
-            logger.Trace("trace message");
             logger.Debug("debug message");
             logger.Info("info message");
+            logger.Warn("warn message");
+
         }
     }
 }
